@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useRef } from 'react'
 
 type Question = {
   question_id: string
@@ -35,8 +36,8 @@ export default function Question() {
   const [randomOrder, setRandomOrder] = useState<number[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
   const navigate = useNavigate()
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Inicializar orden aleatorio cuando se cargan las preguntas
   useEffect(() => {
     if (questions.length > 0) {
       const indices = Array.from({ length: questions.length }, (_, i) => i)
@@ -59,7 +60,16 @@ export default function Question() {
     }
   }
 
+  const cleanupAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.removeEventListener('ended', () => {})
+      audioRef.current = null
+    }
+  }
+
   const playNext = () => {
+    cleanupAudio()
     const voice = Math.floor(Math.random() * 11) + 1
     let index = 0
     if (currentIndex < questions.length - 1) {
@@ -80,6 +90,7 @@ export default function Question() {
           'ended',
           () => {
             setIsPlaying(false)
+            cleanupAudio()
           },
           { once: true }
         )
@@ -89,6 +100,7 @@ export default function Question() {
   }
 
   const play = () => {
+    cleanupAudio()
     if (!currentQuestion) return
 
     setIsPlaying(true)
@@ -106,6 +118,7 @@ export default function Question() {
           () => {
             setTimeout(() => {
               setIsPlaying(false)
+              cleanupAudio()
             }, 2000)
           },
           { once: true }
