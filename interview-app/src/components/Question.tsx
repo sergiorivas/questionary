@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 type Question = {
   question_id: string
@@ -32,6 +33,7 @@ export default function Question() {
   const questions = useQuestions()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [randomOrder, setRandomOrder] = useState<number[]>([])
+  const navigate = useNavigate()
 
   // Inicializar orden aleatorio cuando se cargan las preguntas
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function Question() {
     }
   }
 
-  const reproducir = () => {
+  const play = () => {
     const voice = Math.floor(Math.random() * 11) + 1
     if (!currentQuestion) return
     const audio = new Audio(
@@ -72,10 +74,10 @@ export default function Question() {
         <button
           className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
           onClick={() => {
-            reproducir()
+            play()
           }}
         >
-          Repetir con otra voz
+          Reproducir
         </button>
         <button
           className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
@@ -84,28 +86,12 @@ export default function Question() {
           Siguiente pregunta
         </button>
         <button
-          className="rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
-          onClick={() => {
-            /* lógica para guardar para repaso */
-          }}
-        >
-          Guardar para repaso
-        </button>
-        <button
           className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-          onClick={() => {
-            /* lógica para terminar */
-          }}
+          onClick={() => navigate('/')}
         >
           Terminar
         </button>
       </div>
-      <button
-        className="mt-4 rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
-        onClick={reproducir}
-      >
-        Reproducir pregunta
-      </button>
       <div className="mt-4 text-sm text-gray-500">
         Pregunta {currentIndex + 1} de {questions.length}
       </div>
