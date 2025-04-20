@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRef } from 'react'
+import Papa from 'papaparse'
 
 type Question = {
   question_id: string
@@ -15,15 +16,19 @@ function useQuestions() {
     fetch('/data/questions.csv')
       .then((response) => response.text())
       .then((csv) => {
-        const lines = csv.split('\n').filter((line) => line.trim())
-        const [, ...rows] = lines
-        const parsedQuestions = rows.map((row) => {
-          const [id, question, category] = row
-            .split(',')
-            .map((str) => str.replace(/^"|"$/g, ''))
-          return { question_id: id, question, category }
+        const parsedData = Papa.parse<Question>(csv, {
+          header: true,
+          skipEmptyLines: true
         })
+        const parsedQuestions = parsedData.data.map((row) => ({
+          question_id: row.question_id,
+          question: row.question,
+          category: row.category
+        }))
         setQuestions(parsedQuestions)
+      })
+      .catch((error) => {
+        console.error('Error fetching questions:', error)
       })
   }, [])
 
