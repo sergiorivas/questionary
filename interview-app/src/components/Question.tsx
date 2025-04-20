@@ -9,6 +9,7 @@ type Question = {
   category: string
 }
 
+
 function useQuestions() {
   const [questions, setQuestions] = useState<Question[]>([])
 
@@ -42,13 +43,29 @@ export default function Question() {
   const [isPlaying, setIsPlaying] = useState(false)
   const navigate = useNavigate()
 
+  const playAudio = (questionId: string) => {
+    const voice = Math.floor(Math.random() * 11) + 1
+    const sound = new Howl({
+      src: [`/audios/${questionId}/${voice}.mp3`],
+      preload: true,
+      onload: () => {
+        setIsPlaying(true)
+        sound.play()
+      },
+      onend: () => {
+        setIsPlaying(false)
+      }
+    })
+  }
+
   useEffect(() => {
     if (questions.length > 0) {
       const indices = Array.from({ length: questions.length }, (_, i) => i)
       const shuffled = indices.sort(() => Math.random() - 0.5)
       setRandomOrder(shuffled)
+      playAudio(questions[shuffled[0]].question_id)
     }
-  }, [questions.length])
+  }, [questions, questions.length])
 
   if (!questions.length || !randomOrder.length) {
     return <div>Cargando preguntas...</div>
@@ -62,23 +79,6 @@ export default function Question() {
     } else {
       setCurrentIndex(0)
     }
-  }
-
-  const playAudio = (questionId: string) => {
-    const voice = Math.floor(Math.random() * 11) + 1
-    const sound = new Howl({
-      src: [`/audios/${questionId}/${voice}.mp3`],
-      preload: true,
-      onload: () => {
-        setIsPlaying(true)
-        sound.play()
-      },
-      onend: () => {
-        setTimeout(() => {
-          setIsPlaying(false)
-        }, 2000)
-      }
-    })
   }
 
   const playNext = () => {
