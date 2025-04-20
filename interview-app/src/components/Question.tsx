@@ -66,18 +66,26 @@ export default function Question() {
       `/audios/${currentQuestion.question_id}/${voice}.mp3`
     )
 
-    audio.addEventListener('canplaythrough', () => {
-      audio.play()
-      setIsPlaying(true)
-      audio.addEventListener('ended', () => {
-        setIsPlaying(false)
-      })
-    })
+    audio.addEventListener(
+      'canplaythrough',
+      () => {
+        audio.play()
+        setIsPlaying(true)
+        audio.addEventListener(
+          'ended',
+          () => {
+            setIsPlaying(false)
+          },
+          { once: true }
+        )
+      },
+      { once: true }
+    )
   }
 
   return (
-    <div className="flex h-screen flex-col p-4">
-      <div className="flex h-full items-center text-center text-5xl font-bold">
+    <div className="flex h-screen w-full flex-col p-4">
+      <div className="my-auto text-center text-4xl font-bold">
         {currentQuestion.question}
       </div>
       <div className="">
@@ -85,21 +93,21 @@ export default function Question() {
           <button
             className="min-h-20 w-full rounded bg-green-600 px-4 py-2 text-2xl text-white transition-all hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300 disabled:opacity-50"
             disabled={isPlaying}
-            onClick={() => {
-              play()
-            }}
+            onClick={play}
           >
             Play
           </button>
           <button
-            className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:opacity-50"
+            className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 disabled:opacity-50"
             disabled={isPlaying}
-            onClick={nextQuestion}
+            onClick={() => {
+              nextQuestion()
+            }}
           >
             Next
           </button>
           <button
-            className="min-h-20 w-full rounded bg-red-600 px-4 py-2 text-2xl text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-200 disabled:opacity-50"
+            className="min-h-20 w-full rounded bg-red-600 px-4 py-2 text-2xl text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300 disabled:opacity-50"
             disabled={isPlaying}
             onClick={() => navigate('/')}
           >
