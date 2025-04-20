@@ -59,6 +59,35 @@ export default function Question() {
     }
   }
 
+  const playNext = () => {
+    const voice = Math.floor(Math.random() * 11) + 1
+    let index = 0
+    if (currentIndex < questions.length - 1) {
+      index = currentIndex + 1
+    } else {
+      index = 0
+    }
+    const current = questions[randomOrder[index]]
+    const audio = new Audio(`/audios/${current.question_id}/${voice}.mp3`)
+
+    nextQuestion()
+    audio.addEventListener(
+      'canplaythrough',
+      () => {
+        audio.play()
+        setIsPlaying(true)
+        audio.addEventListener(
+          'ended',
+          () => {
+            setIsPlaying(false)
+          },
+          { once: true }
+        )
+      },
+      { once: true }
+    )
+  }
+
   const play = () => {
     const voice = Math.floor(Math.random() * 11) + 1
     if (!currentQuestion) return
@@ -101,7 +130,7 @@ export default function Question() {
             className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 disabled:opacity-50"
             disabled={isPlaying}
             onClick={() => {
-              nextQuestion()
+              playNext()
             }}
           >
             Next
