@@ -84,10 +84,11 @@ export default function Question() {
     }
     const current = questions[randomOrder[index]]
     const audio = new Audio(`/audios/${current.question_id}/${voice}.mp3`)
+    audio.preload = 'auto'
 
     nextQuestion()
     audio.addEventListener(
-      'canplaythrough',
+      'loadeddata',
       () => {
         audio.play()
         setIsPlaying(true)
@@ -113,9 +114,10 @@ export default function Question() {
     const audio = new Audio(
       `/audios/${currentQuestion.question_id}/${voice}.mp3`
     )
+    audio.preload = 'auto'
 
     audio.addEventListener(
-      'canplaythrough',
+      'loadeddata',
       () => {
         audio.play()
         audio.addEventListener(
@@ -134,7 +136,7 @@ export default function Question() {
   }
 
   return (
-    <div className="flex h-screen w-full flex-col p-4">
+    <div className="flex h-screen w-full flex-col p-4 pb-20">
       <div className="my-auto text-center text-2xl font-bold">
         <span className="text-red-600">({currentQuestion.question_id})</span>{' '}
         {currentQuestion.question}
