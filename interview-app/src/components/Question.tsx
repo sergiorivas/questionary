@@ -17,9 +17,16 @@ export default function Question() {
         (_, i) => i
       ).sort(() => Math.random() - 0.5)
       setRandomOrder(shuffled)
-      playAudio(questions[shuffled[0]].question_id)
     }
-  }, [questions, playAudio])
+  }, [questions])
+
+  useEffect(() => {
+    if (questions.length > 0) {
+      if (questions[randomOrder[currentIndex]]) {
+        playAudio(questions[randomOrder[currentIndex]].question_id)
+      }
+    }
+  }, [questions, playAudio, randomOrder, currentIndex])
 
   if (!questions.length || !randomOrder.length) {
     return <div>Cargando preguntas...</div>
@@ -27,16 +34,8 @@ export default function Question() {
 
   const currentQuestion = questions[randomOrder[currentIndex]]
 
-  function goToNextQuestion(playAudioForNext = false) {
-    const nextIndex = (currentIndex + 1) % questions.length
-    setCurrentIndex(nextIndex)
-    if (playAudioForNext) {
-      playAudio(questions[randomOrder[nextIndex]].question_id)
-    }
-  }
-
   const playNext = () => {
-    goToNextQuestion(true)
+    setCurrentIndex((prev) => (prev + 1) % questions.length)
   }
 
   const play = () => {
