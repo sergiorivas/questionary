@@ -64,7 +64,10 @@ export default function Question() {
     const audio = new Audio(
       `/audios/${currentQuestion.question_id}/${voice}.mp3`
     )
-    audio.play()
+
+    audio.addEventListener('canplaythrough', () => {
+      audio.play()
+    })
   }
 
   return (
