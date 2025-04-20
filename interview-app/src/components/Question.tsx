@@ -50,7 +50,7 @@ export default function Question() {
 
   const currentQuestion = questions[randomOrder[currentIndex]]
 
-  const siguientePregunta = () => {
+  const nextQuestion = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1)
     } else {
@@ -87,7 +87,7 @@ export default function Question() {
           </button>
           <button
             className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white hover:bg-blue-700"
-            onClick={siguientePregunta}
+            onClick={nextQuestion}
           >
             Next
           </button>
