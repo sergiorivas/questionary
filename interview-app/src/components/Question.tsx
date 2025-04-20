@@ -89,8 +89,10 @@ export default function Question() {
   }
 
   const play = () => {
-    const voice = Math.floor(Math.random() * 11) + 1
     if (!currentQuestion) return
+
+    setIsPlaying(true)
+    const voice = Math.floor(Math.random() * 11) + 1
     const audio = new Audio(
       `/audios/${currentQuestion.question_id}/${voice}.mp3`
     )
@@ -99,11 +101,12 @@ export default function Question() {
       'canplaythrough',
       () => {
         audio.play()
-        setIsPlaying(true)
         audio.addEventListener(
           'ended',
           () => {
-            setIsPlaying(false)
+            setTimeout(() => {
+              setIsPlaying(false)
+            }, 2000)
           },
           { once: true }
         )
@@ -114,7 +117,7 @@ export default function Question() {
 
   return (
     <div className="flex h-screen w-full flex-col p-4">
-      <div className="my-auto text-center text-4xl font-bold">
+      <div className="my-auto text-center text-2xl font-bold">
         {currentQuestion.question}
       </div>
       <div className="">
