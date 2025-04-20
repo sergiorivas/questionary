@@ -21,12 +21,10 @@ export default function Question() {
   }, [questions])
 
   useEffect(() => {
-    if (questions.length > 0) {
-      if (questions[randomOrder[currentIndex]]) {
-        playAudio(questions[randomOrder[currentIndex]].question_id)
-      }
+    if (randomOrder.length > 0) {
+      playAudio(questions[randomOrder[currentIndex]].question_id)
     }
-  }, [questions, playAudio, randomOrder, currentIndex])
+  }, [playAudio, randomOrder, currentIndex, questions])
 
   if (!questions.length || !randomOrder.length) {
     return <div>Cargando preguntas...</div>
@@ -35,7 +33,7 @@ export default function Question() {
   const currentQuestion = questions[randomOrder[currentIndex]]
 
   const playNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % questions.length)
+    setCurrentIndex((currentIndex + 1) % questions.length)
   }
 
   const play = () => {
