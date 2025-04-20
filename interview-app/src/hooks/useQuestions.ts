@@ -1,7 +1,11 @@
-import { Question } from "components/Question";
-import Papa from "papaparse";
-import { useState, useEffect } from "react";
+import Papa from 'papaparse'
+import { useState, useEffect } from 'react'
 
+type Question = {
+  question_id: string
+  question: string
+  category: string
+}
 
 export function useQuestions() {
   const [questions, setQuestions] = useState<Question[]>([])

@@ -1,35 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Howl } from 'howler'
 import { useQuestions } from 'hooks/useQuestions'
-
-export type Question = {
-  question_id: string
-  question: string
-  category: string
-}
+import useAudioPlayer from 'hooks/useAudioPlayer'
 
 export default function Question() {
   const questions = useQuestions()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [randomOrder, setRandomOrder] = useState<number[]>([])
-  const [isPlaying, setIsPlaying] = useState(false)
+  const { isPlaying, playAudio } = useAudioPlayer()
   const navigate = useNavigate()
-
-  const playAudio = (questionId: string) => {
-    const voice = Math.floor(Math.random() * 11) + 1
-    const sound = new Howl({
-      src: [`/audios/${questionId}/${voice}.mp3`],
-      preload: true,
-      onload: () => {
-        setIsPlaying(true)
-        sound.play()
-      },
-      onend: () => {
-        setIsPlaying(false)
-      }
-    })
-  }
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -40,7 +19,7 @@ export default function Question() {
       setRandomOrder(shuffled)
       playAudio(questions[shuffled[0]].question_id)
     }
-  }, [questions])
+  }, [questions, playAudio])
 
   if (!questions.length || !randomOrder.length) {
     return <div>Cargando preguntas...</div>
