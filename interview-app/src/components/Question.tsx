@@ -33,12 +33,14 @@ export default function Question() {
 
   useEffect(() => {
     if (questions.length > 0) {
-      const indices = Array.from({ length: questions.length }, (_, i) => i)
-      const shuffled = indices.sort(() => Math.random() - 0.5)
+      const shuffled = Array.from(
+        { length: questions.length },
+        (_, i) => i
+      ).sort(() => Math.random() - 0.5)
       setRandomOrder(shuffled)
       playAudio(questions[shuffled[0]].question_id)
     }
-  }, [questions, questions.length])
+  }, [questions])
 
   if (!questions.length || !randomOrder.length) {
     return <div>Cargando preguntas...</div>
@@ -46,24 +48,16 @@ export default function Question() {
 
   const currentQuestion = questions[randomOrder[currentIndex]]
 
-  function nextQuestion() {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1)
-    } else {
-      setCurrentIndex(0)
+  function goToNextQuestion(playAudioForNext = false) {
+    const nextIndex = (currentIndex + 1) % questions.length
+    setCurrentIndex(nextIndex)
+    if (playAudioForNext) {
+      playAudio(questions[randomOrder[nextIndex]].question_id)
     }
   }
 
   const playNext = () => {
-    let index = 0
-    if (currentIndex < questions.length - 1) {
-      index = currentIndex + 1
-    } else {
-      index = 0
-    }
-    const current = questions[randomOrder[index]]
-    nextQuestion()
-    playAudio(current.question_id)
+    goToNextQuestion(true)
   }
 
   const play = () => {
@@ -94,9 +88,7 @@ export default function Question() {
           <button
             className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 disabled:opacity-50"
             disabled={isPlaying}
-            onClick={() => {
-              playNext()
-            }}
+            onClick={playNext}
           >
             Next
           </button>
