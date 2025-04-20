@@ -71,32 +71,36 @@ export default function Question() {
   }
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-6">
-      <div className="mb-4 text-2xl font-bold">{currentQuestion.question}</div>
-      <div className="flex gap-4">
-        <button
-          className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-          onClick={() => {
-            play()
-          }}
-        >
-          Reproducir
-        </button>
-        <button
-          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          onClick={siguientePregunta}
-        >
-          Siguiente pregunta
-        </button>
-        <button
-          className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-          onClick={() => navigate('/')}
-        >
-          Terminar
-        </button>
+    <div className="flex h-screen flex-col p-4">
+      <div className="flex h-full items-center text-center text-5xl font-bold">
+        {currentQuestion.question}
       </div>
-      <div className="mt-4 text-sm text-gray-500">
-        Pregunta {currentIndex + 1} de {questions.length}
+      <div className="">
+        <div className="flex items-center justify-center gap-4 pt-4">
+          <button
+            className="min-h-20 w-full rounded bg-green-600 px-4 py-2 text-2xl text-white hover:bg-green-700"
+            onClick={() => {
+              play()
+            }}
+          >
+            Play
+          </button>
+          <button
+            className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white hover:bg-blue-700"
+            onClick={siguientePregunta}
+          >
+            Next
+          </button>
+          <button
+            className="min-h-20 w-full rounded bg-red-600 px-4 py-2 text-2xl text-white hover:bg-red-700"
+            onClick={() => navigate('/')}
+          >
+            End
+          </button>
+        </div>
+        <div className="mt-4 w-full text-center text-gray-500">
+          Pregunta {currentIndex + 1} de {questions.length}
+        </div>
       </div>
     </div>
   )
