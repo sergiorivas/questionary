@@ -32,7 +32,6 @@ export default function Question() {
   const questions = useQuestions()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [randomOrder, setRandomOrder] = useState<number[]>([])
-  const [voz, setVoz] = useState(0)
 
   // Inicializar orden aleatorio cuando se cargan las preguntas
   useEffect(() => {
@@ -48,18 +47,22 @@ export default function Question() {
   }
 
   const currentQuestion = questions[randomOrder[currentIndex]]
-  const voces = window.speechSynthesis.getVoices()
-
-  const reproducir = () => {
-    const utter = new SpeechSynthesisUtterance(currentQuestion.question)
-    if (voces[voz]) utter.voice = voces[voz]
-    window.speechSynthesis.speak(utter)
-  }
 
   const siguientePregunta = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1)
+    } else {
+      setCurrentIndex(0)
     }
+  }
+
+  const reproducir = () => {
+    const voice = Math.floor(Math.random() * 11) + 1
+    if (!currentQuestion) return
+    const audio = new Audio(
+      `/audios/${currentQuestion.question_id}/${voice}.mp3`
+    )
+    audio.play()
   }
 
   return (
@@ -69,7 +72,6 @@ export default function Question() {
         <button
           className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
           onClick={() => {
-            setVoz((voz + 1) % voces.length)
             reproducir()
           }}
         >
