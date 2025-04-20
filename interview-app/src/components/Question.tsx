@@ -131,7 +131,13 @@ export default function Question() {
   return (
     <div className="flex h-screen w-full flex-col p-4">
       <div className="my-auto text-center text-2xl font-bold">
+        <span className="text-red-600">({currentQuestion.question_id})</span>{' '}
         {currentQuestion.question}
+        <div>
+          <span className="text-sm text-gray-500">
+            {currentQuestion.category}
+          </span>
+        </div>
       </div>
       <div className="">
         <div className="flex items-center justify-center gap-4 pt-4">
