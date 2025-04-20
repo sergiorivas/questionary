@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useRef } from 'react'
 import Papa from 'papaparse'
+import { Howl } from 'howler'
 
 type Question = {
   question_id: string
@@ -41,7 +41,6 @@ export default function Question() {
   const [randomOrder, setRandomOrder] = useState<number[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
   const navigate = useNavigate()
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -65,17 +64,24 @@ export default function Question() {
     }
   }
 
-  const cleanupAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.removeEventListener('ended', () => {})
-      audioRef.current = null
-    }
+  const playAudio = (questionId: string) => {
+    const voice = Math.floor(Math.random() * 11) + 1
+    const sound = new Howl({
+      src: [`/audios/${questionId}/${voice}.mp3`],
+      preload: true,
+      onload: () => {
+        setIsPlaying(true)
+        sound.play()
+      },
+      onend: () => {
+        setTimeout(() => {
+          setIsPlaying(false)
+        }, 2000)
+      }
+    })
   }
 
   const playNext = () => {
-    cleanupAudio()
-    const voice = Math.floor(Math.random() * 11) + 1
     let index = 0
     if (currentIndex < questions.length - 1) {
       index = currentIndex + 1
@@ -83,56 +89,13 @@ export default function Question() {
       index = 0
     }
     const current = questions[randomOrder[index]]
-    const audio = new Audio(`/audios/${current.question_id}/${voice}.mp3`)
-    audio.preload = 'auto'
-
     nextQuestion()
-    audio.addEventListener(
-      'loadeddata',
-      () => {
-        audio.play()
-        setIsPlaying(true)
-        audio.addEventListener(
-          'ended',
-          () => {
-            setIsPlaying(false)
-            cleanupAudio()
-          },
-          { once: true }
-        )
-      },
-      { once: true }
-    )
+    playAudio(current.question_id)
   }
 
   const play = () => {
-    cleanupAudio()
     if (!currentQuestion) return
-
-    setIsPlaying(true)
-    const voice = Math.floor(Math.random() * 11) + 1
-    const audio = new Audio(
-      `/audios/${currentQuestion.question_id}/${voice}.mp3`
-    )
-    audio.preload = 'auto'
-
-    audio.addEventListener(
-      'loadeddata',
-      () => {
-        audio.play()
-        audio.addEventListener(
-          'ended',
-          () => {
-            setTimeout(() => {
-              setIsPlaying(false)
-              cleanupAudio()
-            }, 2000)
-          },
-          { once: true }
-        )
-      },
-      { once: true }
-    )
+    playAudio(currentQuestion.question_id)
   }
 
   return (
