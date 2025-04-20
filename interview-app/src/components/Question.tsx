@@ -1,23 +1,70 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+type Question = {
+  question_id: string
+  question: string
+  category: string
+}
+
+function useQuestions() {
+  const [questions, setQuestions] = useState<Question[]>([])
+
+  useEffect(() => {
+    fetch('/data/questions.csv')
+      .then((response) => response.text())
+      .then((csv) => {
+        const lines = csv.split('\n').filter((line) => line.trim())
+        const [, ...rows] = lines
+        const parsedQuestions = rows.map((row) => {
+          const [id, question, category] = row
+            .split(',')
+            .map((str) => str.replace(/^"|"$/g, ''))
+          return { question_id: id, question, category }
+        })
+        setQuestions(parsedQuestions)
+      })
+  }, [])
+
+  return questions
+}
 
 export default function Question() {
+  const questions = useQuestions()
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [randomOrder, setRandomOrder] = useState<number[]>([])
   const [voz, setVoz] = useState(0)
-  const pregunta = '¿Cuál es la capital de Francia?'
-  const voces = [
-    window.speechSynthesis.getVoices()[0],
-    window.speechSynthesis.getVoices()[1],
-    window.speechSynthesis.getVoices()[2]
-  ]
+
+  // Inicializar orden aleatorio cuando se cargan las preguntas
+  useEffect(() => {
+    if (questions.length > 0) {
+      const indices = Array.from({ length: questions.length }, (_, i) => i)
+      const shuffled = indices.sort(() => Math.random() - 0.5)
+      setRandomOrder(shuffled)
+    }
+  }, [questions.length])
+
+  if (!questions.length || !randomOrder.length) {
+    return <div>Cargando preguntas...</div>
+  }
+
+  const currentQuestion = questions[randomOrder[currentIndex]]
+  const voces = window.speechSynthesis.getVoices()
 
   const reproducir = () => {
-    const utter = new window.SpeechSynthesisUtterance(pregunta)
+    const utter = new SpeechSynthesisUtterance(currentQuestion.question)
     if (voces[voz]) utter.voice = voces[voz]
     window.speechSynthesis.speak(utter)
   }
 
+  const siguientePregunta = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((prev) => prev + 1)
+    }
+  }
+
   return (
     <div className="flex h-screen flex-col items-center justify-center gap-6">
-      <div className="mb-4 text-2xl font-bold">{pregunta}</div>
+      <div className="mb-4 text-2xl font-bold">{currentQuestion.question}</div>
       <div className="flex gap-4">
         <button
           className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
@@ -30,9 +77,7 @@ export default function Question() {
         </button>
         <button
           className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          onClick={() => {
-            /* lógica para siguiente pregunta */
-          }}
+          onClick={siguientePregunta}
         >
           Siguiente pregunta
         </button>
@@ -59,6 +104,9 @@ export default function Question() {
       >
         Reproducir pregunta
       </button>
+      <div className="mt-4 text-sm text-gray-500">
+        Pregunta {currentIndex + 1} de {questions.length}
+      </div>
     </div>
   )
 }
