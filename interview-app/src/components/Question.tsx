@@ -33,6 +33,7 @@ export default function Question() {
   const questions = useQuestions()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [randomOrder, setRandomOrder] = useState<number[]>([])
+  const [isPlaying, setIsPlaying] = useState(false)
   const navigate = useNavigate()
 
   // Inicializar orden aleatorio cuando se cargan las preguntas
@@ -50,7 +51,7 @@ export default function Question() {
 
   const currentQuestion = questions[randomOrder[currentIndex]]
 
-  const nextQuestion = () => {
+  function nextQuestion() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1)
     } else {
@@ -67,6 +68,10 @@ export default function Question() {
 
     audio.addEventListener('canplaythrough', () => {
       audio.play()
+      setIsPlaying(true)
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false)
+      })
     })
   }
 
@@ -78,7 +83,8 @@ export default function Question() {
       <div className="">
         <div className="flex items-center justify-center gap-4 pt-4">
           <button
-            className="min-h-20 w-full rounded bg-green-600 px-4 py-2 text-2xl text-white hover:bg-green-700"
+            className="min-h-20 w-full rounded bg-green-600 px-4 py-2 text-2xl text-white transition-all hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300 disabled:opacity-50"
+            disabled={isPlaying}
             onClick={() => {
               play()
             }}
@@ -86,13 +92,15 @@ export default function Question() {
             Play
           </button>
           <button
-            className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white hover:bg-blue-700"
+            className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:opacity-50"
+            disabled={isPlaying}
             onClick={nextQuestion}
           >
             Next
           </button>
           <button
-            className="min-h-20 w-full rounded bg-red-600 px-4 py-2 text-2xl text-white hover:bg-red-700"
+            className="min-h-20 w-full rounded bg-red-600 px-4 py-2 text-2xl text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-200 disabled:opacity-50"
+            disabled={isPlaying}
             onClick={() => navigate('/')}
           >
             End
