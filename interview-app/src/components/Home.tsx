@@ -1,15 +1,23 @@
 import { useNavigate } from 'react-router-dom'
+import { Page, Button, Block, Navbar } from 'konsta/react'
 
 export default function Home() {
   const navigate = useNavigate()
+
   return (
-    <div className="flex h-screen items-center justify-center">
-      <button
-        className="rounded bg-blue-600 px-6 py-3 text-4xl font-bold text-white shadow transition hover:bg-blue-700"
-        onClick={() => navigate('/question')}
+    <Page className="safe-areas">
+      <Navbar title="Interview - Home" />
+
+      <Block
+        strong
+        inset
+        className="flex flex-col items-center justify-center text-center"
       >
-        Start
-      </button>
-    </div>
+        <p className="mb-4">Welcome</p>
+        <Button rounded large onClick={() => navigate('/question')}>
+          Start
+        </Button>
+      </Block>
+    </Page>
   )
 }

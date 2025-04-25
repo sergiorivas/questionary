@@ -2,10 +2,21 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuestions } from 'hooks/useQuestions'
 import useAudioPlayer from 'hooks/useAudioPlayer'
+import {
+  Page,
+  Navbar,
+  Card,
+  Block,
+  Tabbar,
+  Link,
+  Chip,
+  TabbarLink
+} from 'konsta/react'
 
 export default function Question() {
   const questions = useQuestions()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [pressed, setPressed] = useState(false)
   const [randomOrder, setRandomOrder] = useState<number[]>([])
   const { isPlaying, playAudio } = useAudioPlayer()
   const navigate = useNavigate()
@@ -21,65 +32,86 @@ export default function Question() {
   }, [questions])
 
   useEffect(() => {
-    if (randomOrder.length > 0) {
-      playAudio(questions[randomOrder[currentIndex]].question_id)
+    if (randomOrder.length > 0 && !isPlaying && !pressed) {
+      setPressed(true)
+      setTimeout(() => {
+        play()
+        setPressed(false)
+      }, 0)
     }
-  }, [playAudio, randomOrder, currentIndex, questions])
+  }, [randomOrder, currentIndex])
 
   if (!questions.length || !randomOrder.length) {
-    return <div>Cargando preguntas...</div>
+    return (
+      <Page>
+        <Block className="flex h-screen items-center justify-center">
+          Loading...
+        </Block>
+      </Page>
+    )
   }
 
   const currentQuestion = questions[randomOrder[currentIndex]]
 
   const playNext = () => {
+    if (pressed || isPlaying) return
+
     setCurrentIndex((currentIndex + 1) % questions.length)
   }
 
   const play = () => {
     if (!currentQuestion) return
+    if (pressed || isPlaying) return
+
     playAudio(currentQuestion.question_id)
   }
 
   return (
-    <div className="flex h-screen w-full flex-col p-4 pb-20">
-      <div className="my-auto text-center text-2xl font-bold">
-        <span className="text-red-600">({currentQuestion.question_id})</span>{' '}
-        {currentQuestion.question}
-        <div>
-          <span className="text-sm text-gray-500">
-            {currentQuestion.category}
-          </span>
+    <Page className="flex">
+      <Navbar
+        title="Interview - Question"
+        left={
+          <Link navbar onClick={() => navigate('/')}>
+            Back
+          </Link>
+        }
+        className="fixed top-0 z-10"
+      />
+
+      <Block>
+        <Card
+          header={`Question ID-${currentQuestion.question_id}`}
+          footer={currentQuestion.category}
+          headerDivider
+          footerDivider
+          raised
+          className="mt-8"
+        >
+          <div className="text-2xl">{currentQuestion.question}</div>
+        </Card>
+        <div className="text-center">
+          <Chip>
+            {currentIndex + 1} / {questions.length}
+          </Chip>
         </div>
-      </div>
-      <div className="">
-        <div className="flex items-center justify-center gap-4 pt-4">
-          <button
-            className="min-h-20 w-full rounded bg-green-600 px-4 py-2 text-2xl text-white transition-all hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300 disabled:opacity-50"
-            disabled={isPlaying}
-            onClick={play}
-          >
-            Play
-          </button>
-          <button
-            className="min-h-20 w-full rounded bg-blue-600 px-4 py-2 text-2xl text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 disabled:opacity-50"
-            disabled={isPlaying}
-            onClick={playNext}
-          >
-            Next
-          </button>
-          <button
-            className="min-h-20 w-full rounded bg-red-600 px-4 py-2 text-2xl text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300 disabled:opacity-50"
-            disabled={isPlaying}
-            onClick={() => navigate('/')}
-          >
-            End
-          </button>
-        </div>
-        <div className="mt-4 w-full text-center text-gray-500">
-          Pregunta {currentIndex + 1} de {questions.length}
-        </div>
-      </div>
-    </div>
+      </Block>
+
+      <Tabbar className="left-0 bottom-0 fixed">
+        <TabbarLink
+          icon="🔊"
+          label="Replay"
+          active={!isPlaying && !pressed}
+          onClick={play}
+          className={`${isPlaying ? 'opacity-50' : ''}`}
+        />
+        <TabbarLink
+          icon="⏭️"
+          label="Next"
+          active={!isPlaying && !pressed}
+          onClick={playNext}
+          className={`${isPlaying ? 'opacity-50' : ''}`}
+        />
+      </Tabbar>
+    </Page>
   )
 }
